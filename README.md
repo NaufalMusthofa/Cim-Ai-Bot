@@ -52,7 +52,13 @@ pnpm prisma:generate
 pnpm prisma:push
 ```
 
-6. Jalankan aplikasi:
+6. Aktifkan RLS di Supabase:
+
+- Buka `SQL Editor` di dashboard Supabase.
+- Jalankan SQL dari [supabase/enable-rls.sql](/Users/naufal/Documents/cim-ai/supabase/enable-rls.sql).
+- Ini akan mengaktifkan Row Level Security untuk semua tabel app dan membuat policy `authenticated` berbasis `auth.uid()`.
+
+7. Jalankan aplikasi:
 
 ```bash
 pnpm dev
