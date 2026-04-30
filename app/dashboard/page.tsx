@@ -4,6 +4,8 @@ import { requireAppWorkspace } from "@/lib/auth";
 import { formatDateTime, redactToken } from "@/lib/utils";
 import { getDashboardSummary } from "@/repositories/dashboard.repository";
 
+type LatestMessageRow = Awaited<ReturnType<typeof getDashboardSummary>>["latestMessages"][number];
+
 export default async function DashboardPage() {
   const { profile, subscription } = await requireAppWorkspace();
   const summary = await getDashboardSummary(profile.id);
@@ -61,7 +63,7 @@ export default async function DashboardPage() {
           <h3 className="font-display text-3xl text-ink">Pesan Terbaru</h3>
           <div className="mt-6 space-y-4">
             {summary.latestMessages.length ? (
-              summary.latestMessages.map((message) => (
+              summary.latestMessages.map((message: LatestMessageRow) => (
                 <div key={message.id} className="rounded-[22px] border border-ink/8 bg-white/75 p-4">
                   <div className="flex items-center justify-between gap-4 text-sm text-ink/60">
                     <span>{message.contact.displayName || message.contact.phone}</span>

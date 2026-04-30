@@ -2,6 +2,9 @@ import { requireAppWorkspace } from "@/lib/auth";
 import { formatDateTime } from "@/lib/utils";
 import { listConversationsByProfile } from "@/repositories/conversation.repository";
 
+type ConversationRow = Awaited<ReturnType<typeof listConversationsByProfile>>[number];
+type ConversationMessageRow = ConversationRow["messages"][number];
+
 export default async function ConversationsPage() {
   const { profile } = await requireAppWorkspace();
   const conversations = await listConversationsByProfile(profile.id);
@@ -15,7 +18,7 @@ export default async function ConversationsPage() {
 
       <div className="space-y-4">
         {conversations.length ? (
-          conversations.map((conversation) => (
+          conversations.map((conversation: ConversationRow) => (
             <article key={conversation.id} className="panel p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -31,7 +34,7 @@ export default async function ConversationsPage() {
 
               <div className="mt-5 space-y-3">
                 {conversation.messages.length ? (
-                  conversation.messages.map((message) => (
+                  conversation.messages.map((message: ConversationMessageRow) => (
                     <div key={message.id} className="rounded-[22px] border border-ink/8 bg-white/75 p-4">
                       <p className="text-xs uppercase tracking-[0.18em] text-ember/75">{message.role}</p>
                       <p className="mt-2 text-sm leading-7 text-ink/80">{message.content}</p>

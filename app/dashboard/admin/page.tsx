@@ -4,6 +4,8 @@ import { listProfilesPendingUpgrade } from "@/repositories/profile.repository";
 import { activateProAction } from "@/app/dashboard/actions";
 import { SubmitButton } from "@/components/submit-button";
 
+type PendingProfile = Awaited<ReturnType<typeof listProfilesPendingUpgrade>>[number];
+
 export default async function AdminPage(props: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
@@ -32,7 +34,7 @@ export default async function AdminPage(props: {
           </thead>
           <tbody>
             {pendingProfiles.length ? (
-              pendingProfiles.map((profile) => (
+              pendingProfiles.map((profile: PendingProfile) => (
                 <tr key={profile.id}>
                   <td>{profile.email}</td>
                   <td>{profile.businessName || "-"}</td>

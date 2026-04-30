@@ -2,6 +2,8 @@ import { requireAppWorkspace } from "@/lib/auth";
 import { formatDateTime } from "@/lib/utils";
 import { listContactsByProfile } from "@/repositories/contact.repository";
 
+type ContactRow = Awaited<ReturnType<typeof listContactsByProfile>>[number];
+
 export default async function ContactsPage() {
   const { profile } = await requireAppWorkspace();
   const contacts = await listContactsByProfile(profile.id);
@@ -25,7 +27,7 @@ export default async function ContactsPage() {
           </thead>
           <tbody>
             {contacts.length ? (
-              contacts.map((contact) => (
+              contacts.map((contact: ContactRow) => (
                 <tr key={contact.id}>
                   <td>
                     <p className="font-medium text-ink">{contact.displayName || "Tanpa nama"}</p>
