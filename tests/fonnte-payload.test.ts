@@ -39,4 +39,37 @@ describe("fonnte-payload parser", () => {
 
     expect(payload.isGroup).toBe(true);
   });
+
+  it("does not reuse inboxid alone as the dedupe key", async () => {
+    const firstRequest = new Request("http://localhost", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        sender: "62812345",
+        inboxid: "same-inbox",
+        message: "halo",
+        timestamp: 1_777_777_777
+      })
+    });
+
+    const secondRequest = new Request("http://localhost", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        sender: "62812345",
+        inboxid: "same-inbox",
+        message: "saya mau website",
+        timestamp: 1_777_777_888
+      })
+    });
+
+    const firstPayload = await parseFonntePayload(firstRequest);
+    const secondPayload = await parseFonntePayload(secondRequest);
+
+    expect(firstPayload.eventId).not.toBe(secondPayload.eventId);
+  });
 });
