@@ -16,7 +16,30 @@ enum Plan {
 enum MessageRole {
   USER
   ASSISTANT
+  HUMAN
   SYSTEM
+}
+
+enum ContactMode {
+  AI
+  HUMAN
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PromptType {
+  SYSTEM_BASE
+  PERSONAL_MODE
+  SALES_MODE
+  FALLBACK_PERSONAL
+  FALLBACK_SALES
+  FOLLOWUP_STAGE_1
+  FOLLOWUP_STAGE_2
+  FOLLOWUP_STAGE_3
 }
 
 enum FollowupStatus {
@@ -50,6 +73,7 @@ model Profile {
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   contacts           Contact[]
+  paymentRequests    PaymentRequest[]
   subscriptions      Subscription[]
   webhookEvents      WebhookEvent[]
 
@@ -61,6 +85,7 @@ model Contact {
   profileId        String         @db.Uuid
   phone            String
   displayName      String?
+  mode             ContactMode    @default(AI)
   lastInteraction  DateTime?
   followupCount    Int            @default(0)
   lastInboundAt    DateTime?
@@ -169,4 +194,40 @@ model WebhookEvent {
   @@unique([profileId, dedupeKey])
   @@index([profileId, createdAt])
   @@map("webhook_events")
+}
+
+model PaymentRequest {
+  id              String        @id @default(cuid())
+  profileId       String        @db.Uuid
+  plan            Plan
+  amount          Int
+  status          PaymentStatus @default(PENDING)
+  proofUrl        String
+  proofPath       String
+  senderNote      String?
+  requestedAt     DateTime      @default(now())
+  reviewedAt      DateTime?
+  reviewedByEmail String?
+  reviewNote      String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  profile         Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, requestedAt])
+  @@index([status, requestedAt])
+  @@map("payment_requests")
+}
+
+model PromptCard {
+  id        String     @id @default(cuid())
+  name      String
+  type      PromptType
+  content   String
+  isActive  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([type, name])
+  @@index([type, isActive])
+  @@map("prompt_cards")
 }

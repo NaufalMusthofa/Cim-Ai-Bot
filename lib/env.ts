@@ -17,6 +17,18 @@ export function getDefaultFonnteToken() {
   return process.env.DEFAULT_FONNTE_TOKEN?.trim() || "";
 }
 
+export function getAdminNotificationPhone() {
+  return process.env.ADMIN_NOTIFICATION_PHONE?.trim() || "";
+}
+
+export function getAdminNotifierToken() {
+  return process.env.ADMIN_NOTIFIER_FONNTE_TOKEN?.trim() || getDefaultFonnteToken();
+}
+
+export function getPaymentProofBucket() {
+  return process.env.SUPABASE_PAYMENT_PROOF_BUCKET?.trim() || "payment-proofs";
+}
+
 export function requireEnv(name: string) {
   const value = process.env[name];
 

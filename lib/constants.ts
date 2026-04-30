@@ -8,6 +8,8 @@ export const PLAN_LIMITS: Record<PlanType, number> = {
   PRO: 300
 };
 
+export const PRO_PLAN_AMOUNT = 150_000;
+
 export const FOLLOWUP_SCHEDULE_DAYS: Record<FollowupStage, number> = {
   1: 1,
   2: 3,

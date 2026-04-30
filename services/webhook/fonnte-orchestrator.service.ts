@@ -5,9 +5,11 @@ import { cancelPendingFollowups, scheduleFollowups } from "@/services/trigger/fo
 import { createMessage, listRecentMessages } from "@/repositories/message.repository";
 import { findProfileByWebhook } from "@/repositories/profile.repository";
 import { createWebhookEvent, updateWebhookEventStatus } from "@/repositories/webhook-event.repository";
+import { resolveAssistantMode } from "@/services/ai/assistant-mode.service";
+import { getActivePromptCardMap } from "@/services/ai/prompt-card.service";
 import { buildConversationTranscript, buildSystemPrompt } from "@/services/ai/prompt.service";
 import { generateAiReply } from "@/services/ai/gemini.service";
-import { getMemoryContext, updateMemoryFromConversation } from "@/services/crm/memory.service";
+import { getMemorySnapshot, updateMemoryFromConversation } from "@/services/crm/memory.service";
 import { ensureSubscriptionForPlan, getRemainingQuota, hasRemainingQuota, incrementSubscriptionUsage } from "@/services/subscription/subscription.service";
 import { evaluateKeywordTrigger } from "@/services/trigger/keyword-trigger.service";
 import { detectCommand, getCommandMessage } from "@/services/whatsapp/command.service";
@@ -76,6 +78,26 @@ export async function processFonnteWebhook(input: {
       return { status: "command" as const, command };
     }
 
+    if (contact.mode === "HUMAN") {
+      await Promise.all([
+        createMessage({
+          conversationId: conversation.id,
+          contactId: contact.id,
+          role: "USER",
+          content: input.payload.message || "[Attachment received]",
+          externalId: input.payload.eventId,
+          inboxId: input.payload.inboxId,
+          metadata: input.payload.attachment ? { attachment: input.payload.attachment } : null
+        }),
+        touchConversation(conversation.id, new Date()),
+        updateWebhookEventStatus(webhookEvent.id, { status: "PROCESSED" })
+      ]);
+
+      return {
+        status: "human_mode" as const
+      };
+    }
+
     if (!hasRemainingQuota(subscription)) {
       await sendWhatsAppMessage({
         token: profile.fonnteToken,
@@ -101,23 +123,49 @@ export async function processFonnteWebhook(input: {
       metadata: input.payload.attachment ? { attachment: input.payload.attachment } : null
     });
 
-    const triggerDecision = evaluateKeywordTrigger(input.payload.message);
-    const [memories, history] = await Promise.all([
-      getMemoryContext(contact.id),
-      listRecentMessages(conversation.id)
+    const [memoryState, recentHistory, promptCards] = await Promise.all([
+      getMemorySnapshot(contact.id),
+      listRecentMessages(conversation.id),
+      getActivePromptCardMap()
     ]);
+    const assistantModeDecision = resolveAssistantMode({
+      latestMessage: input.payload.message,
+      historyMessages: recentHistory.map((message) => ({
+        role: message.role,
+        content: message.content
+      })),
+      lastModeHint: memoryState.assistantModeHint
+    });
+    const rawTriggerDecision = evaluateKeywordTrigger(input.payload.message);
+    const triggerDecision =
+      assistantModeDecision.mode === "SALES"
+        ? rawTriggerDecision
+        : {
+            matchedKeywords: [],
+            qualifiesForFollowup: false
+          };
 
     const aiReply = await generateAiReply({
+      assistantMode: assistantModeDecision.mode,
       systemPrompt: buildSystemPrompt({
+        assistantMode: assistantModeDecision.mode,
+        basePrompt: promptCards.systemBase,
+        modePrompt: assistantModeDecision.mode === "PERSONAL" ? promptCards.personalMode : promptCards.salesMode,
         profile: {
           businessName: profile.businessName,
           email: profile.email
         },
-        memoryContext: memories,
+        memoryContext: memoryState.context,
         triggerDecision
       }),
-      conversation: buildConversationTranscript(history),
-      latestMessage: input.payload.message
+      fallbackTemplate: assistantModeDecision.mode === "PERSONAL" ? promptCards.fallbackPersonal : promptCards.fallbackSales,
+      conversation: buildConversationTranscript(recentHistory),
+      historyMessages: recentHistory.map((message) => ({
+        role: message.role,
+        content: message.content
+      })),
+      latestMessage: input.payload.message,
+      triggerDecision
     });
 
     await sendWhatsAppMessage({
@@ -141,13 +189,14 @@ export async function processFonnteWebhook(input: {
         senderName: input.payload.senderName,
         lastMessage: input.payload.message,
         lastReply: aiReply,
+        assistantMode: assistantModeDecision.mode,
         triggerDecision
       }),
       updateContactAfterReply(contact.id, new Date()),
       touchConversation(conversation.id, new Date())
     ]);
 
-    if (triggerDecision.qualifiesForFollowup) {
+    if (assistantModeDecision.mode === "SALES" && triggerDecision.qualifiesForFollowup) {
       await scheduleFollowups(contact.id, new Date());
     }
 

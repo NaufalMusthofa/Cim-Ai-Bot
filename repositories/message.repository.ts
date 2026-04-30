@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function createMessage(input: {
   conversationId: string;
   contactId: string;
-  role: "USER" | "ASSISTANT" | "SYSTEM";
+  role: "USER" | "ASSISTANT" | "HUMAN" | "SYSTEM";
   content: string;
   externalId?: string;
   inboxId?: string;

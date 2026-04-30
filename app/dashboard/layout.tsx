@@ -5,8 +5,8 @@ import { signOutAction } from "@/app/auth/actions";
 
 const navItems: Array<{ href: Route; label: string }> = [
   { href: "/dashboard", label: "Overview" },
+  { href: "/dashboard/chat" as Route, label: "Chat" },
   { href: "/dashboard/contacts", label: "Contacts" },
-  { href: "/dashboard/conversations", label: "Conversations" },
   { href: "/dashboard/whatsapp", label: "WhatsApp" },
   { href: "/dashboard/billing", label: "Billing" },
   { href: "/dashboard/admin", label: "Admin" }

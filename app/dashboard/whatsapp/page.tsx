@@ -40,6 +40,10 @@ export default async function WhatsAppPage(props: {
               <dt className="text-xs uppercase tracking-[0.18em] text-ember/80">Webhook URL unik</dt>
               <dd className="mt-2 break-all">{webhookUrl}</dd>
             </div>
+            <div className="rounded-[20px] bg-white/65 p-4">
+              <dt className="text-xs uppercase tracking-[0.18em] text-ember/80">Mode AI</dt>
+              <dd className="mt-2">Auto Route: Personal + Sales</dd>
+            </div>
           </dl>
           <form action={regenerateWebhookKeyAction} className="mt-6">
             <SubmitButton idleLabel="Regenerate Webhook Key" className="button-secondary" />

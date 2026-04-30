@@ -10,6 +10,7 @@ import {
   scheduleFollowupStage
 } from "@/repositories/followup.repository";
 import { createMessage } from "@/repositories/message.repository";
+import { getFollowupPromptContent } from "@/services/ai/prompt-card.service";
 import { sendWhatsAppMessage } from "@/services/whatsapp/fonnte.service";
 
 const stageMap = {
@@ -17,18 +18,6 @@ const stageMap = {
   2: "STAGE_2",
   3: "STAGE_3"
 } as const;
-
-export function getFollowupMessage(stage: 1 | 2 | 3) {
-  if (stage === 1) {
-    return "Halo kak 😊 kemarin sempat tanya soal website.\nMasih butuh bantuan?";
-  }
-
-  if (stage === 2) {
-    return "Kami siap bantu kapan saja ya kak 🙏\nKalau ada pertanyaan tinggal bilang saja";
-  }
-
-  return "Terakhir ya kak 😊\nKalau masih butuh jasa website, kami siap bantu";
-}
 
 export async function scheduleFollowups(contactId: string, fromDate = new Date()) {
   const existingJobs = await listFollowupsByContact(contactId);
@@ -64,8 +53,12 @@ export async function processDueFollowups(now = new Date()) {
           throw new Error("Fonnte token belum tersedia untuk tenant ini.");
         }
 
+        if (job.contact.mode !== "AI") {
+          return { jobId: job.id, status: "skipped" as const };
+        }
+
         const conversation = await findOrCreateConversation(job.contactId);
-        const message = getFollowupMessage(stage);
+        const message = await getFollowupPromptContent(stage);
 
         await sendWhatsAppMessage({
           token: job.contact.profile.fonnteToken,

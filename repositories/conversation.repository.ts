@@ -49,3 +49,35 @@ export async function listConversationsByProfile(profileId: string) {
     }
   });
 }
+
+export async function getConversationThreadForContact(profileId: string, contactId: string, limit = 50) {
+  const conversation = await prisma.conversation.findFirst({
+    where: {
+      contactId,
+      contact: {
+        profileId
+      }
+    },
+    include: {
+      contact: true,
+      messages: {
+        orderBy: {
+          createdAt: "desc"
+        },
+        take: limit
+      }
+    },
+    orderBy: {
+      updatedAt: "desc"
+    }
+  });
+
+  if (!conversation) {
+    return null;
+  }
+
+  return {
+    ...conversation,
+    messages: [...conversation.messages].reverse()
+  };
+}

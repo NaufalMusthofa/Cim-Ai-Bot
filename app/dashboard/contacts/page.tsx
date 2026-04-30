@@ -20,6 +20,7 @@ export default async function ContactsPage() {
           <thead>
             <tr>
               <th>Kontak</th>
+              <th>Mode</th>
               <th>Interaksi terakhir</th>
               <th>Follow-up</th>
               <th>Memory</th>
@@ -33,6 +34,7 @@ export default async function ContactsPage() {
                     <p className="font-medium text-ink">{contact.displayName || "Tanpa nama"}</p>
                     <p className="mt-1 text-sm text-ink/60">{contact.phone}</p>
                   </td>
+                  <td className="text-sm text-ink/70">{contact.mode}</td>
                   <td className="text-sm text-ink/70">
                     {contact.lastInteraction ? formatDateTime(contact.lastInteraction) : "Belum ada balasan AI"}
                   </td>
@@ -42,7 +44,7 @@ export default async function ContactsPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="text-sm text-ink/60">
+                <td colSpan={5} className="text-sm text-ink/60">
                   Belum ada kontak. Data akan muncul setelah webhook Fonnte menerima chat personal 1:1.
                 </td>
               </tr>

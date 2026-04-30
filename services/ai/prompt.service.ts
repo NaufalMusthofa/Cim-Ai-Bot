@@ -1,24 +1,33 @@
 import type { Message, Profile } from "@prisma/client";
-import type { TriggerDecision } from "@/types/domain";
+import type { AssistantMode, TriggerDecision } from "@/types/domain";
 
 export function buildSystemPrompt(input: {
+  assistantMode: AssistantMode;
+  basePrompt: string;
+  modePrompt: string;
   profile: Pick<Profile, "businessName" | "email">;
   memoryContext: string;
   triggerDecision: TriggerDecision;
 }) {
-  return [
-    "Kamu adalah asisten WhatsApp CIM AI untuk customer service dan sales dalam Bahasa Indonesia.",
-    "Jawab dengan ramah, singkat, jelas, dan natural seperti admin bisnis di Indonesia.",
-    "Fokus bantu user, gali kebutuhan secukupnya, lalu arahkan ke solusi bisnis yang relevan.",
-    "Jika user terlihat butuh solusi bisnis atau ingin jualan online, arahkan secara halus ke jasa pembuatan website.",
-    "Jangan mengaku sebagai AI. Jangan menggunakan format yang terlalu panjang.",
+  const sharedContext = [
+    `Mode aktif saat ini: ${input.assistantMode}.`,
     `Nama bisnis tenant: ${input.profile.businessName || "CIM AI Partner"}.`,
     `Email owner tenant: ${input.profile.email}.`,
-    `Memory customer:\n${input.memoryContext}`,
-    input.triggerDecision.promotionSnippet
-      ? `Gunakan sisipan promosi ini dengan natural jika relevan: ${input.triggerDecision.promotionSnippet}`
-      : "Tidak ada keyword trigger khusus untuk pesan ini."
-  ].join("\n\n");
+    `Memory customer:\n${input.memoryContext}`
+  ];
+
+  return [
+    input.basePrompt,
+    input.modePrompt,
+    ...sharedContext,
+    input.assistantMode === "SALES"
+      ? input.triggerDecision.promotionSnippet
+        ? `Gunakan sisipan promosi ini dengan natural jika relevan: ${input.triggerDecision.promotionSnippet}`
+        : "Tidak ada keyword trigger khusus untuk pesan ini."
+      : "Mode personal aktif. Fokus pada bantuan yang natural dan relevan."
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 export function buildConversationTranscript(messages: Pick<Message, "role" | "content">[]) {
