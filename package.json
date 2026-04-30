@@ -5,13 +5,14 @@
   "packageManager": "pnpm@10.19.0",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "sh -ac 'if [ -f ./.env.local ]; then set -a; . ./.env.local; set +a; fi; prisma generate'",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prisma:generate": "sh -ac 'set -a; . ./.env.local; set +a; prisma generate'",
+    "prisma:generate": "sh -ac 'if [ -f ./.env.local ]; then set -a; . ./.env.local; set +a; fi; prisma generate'",
     "prisma:migrate": "sh -ac 'set -a; . ./.env.local; set +a; prisma migrate dev'",
     "prisma:push": "sh -ac 'set -a; . ./.env.local; set +a; prisma db push'"
   },
