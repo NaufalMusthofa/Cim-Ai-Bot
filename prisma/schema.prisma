@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum FollowupStatus {
+  PENDING
+  SENT
+  CANCELLED
+}
+
+enum FollowupStage {
+  STAGE_1
+  STAGE_2
+  STAGE_3
+}
+
+enum WebhookEventStatus {
+  RECEIVED
+  PROCESSED
+  DUPLICATE
+  FAILED
+  IGNORED
+}
+
+model Profile {
+  id                 String          @id @db.Uuid
+  email              String          @unique
+  businessName       String?
+  plan               Plan            @default(FREE)
+  fonnteToken        String?
+  webhookKey         String          @unique
+  upgradeRequestedAt DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  contacts           Contact[]
+  subscriptions      Subscription[]
+  webhookEvents      WebhookEvent[]
+
+  @@map("profiles")
+}
+
+model Contact {
+  id               String         @id @default(cuid())
+  profileId        String         @db.Uuid
+  phone            String
+  displayName      String?
+  lastInteraction  DateTime?
+  followupCount    Int            @default(0)
+  lastInboundAt    DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  profile          Profile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  conversations    Conversation[]
+  messages         Message[]
+  memories         MemoryEntry[]
+  followupJobs     FollowupJob[]
+
+  @@unique([profileId, phone])
+  @@index([profileId, lastInteraction])
+  @@map("contacts")
+}
+
+model Conversation {
+  id             String      @id @default(cuid())
+  contactId      String
+  summary        String?
+  lastMessageAt  DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  contact        Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  messages       Message[]
+
+  @@index([contactId, lastMessageAt])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  contactId      String
+  role           MessageRole
+  content        String
+  externalId     String?
+  inboxId        String?
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  contact        Contact      @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId, createdAt])
+  @@map("messages")
+}
+
+model MemoryEntry {
+  id         String   @id @default(cuid())
+  contactId  String
+  key        String
+  value      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  contact    Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, key])
+  @@map("memories")
+}
+
+model Subscription {
+  id                 String   @id @default(cuid())
+  profileId          String   @db.Uuid
+  plan               Plan
+  usageCount         Int      @default(0)
+  limitCount         Int
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  profile            Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, currentPeriodEnd])
+  @@map("subscriptions")
+}
+
+model FollowupJob {
+  id           String         @id @default(cuid())
+  contactId    String
+  stage        FollowupStage
+  status       FollowupStatus @default(PENDING)
+  dueAt        DateTime
+  sentAt       DateTime?
+  cancelledAt  DateTime?
+  lastError    String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  contact      Contact        @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, stage])
+  @@index([status, dueAt])
+  @@map("followup_jobs")
+}
+
+model WebhookEvent {
+  id          String             @id @default(cuid())
+  profileId   String             @db.Uuid
+  dedupeKey   String
+  status      WebhookEventStatus @default(RECEIVED)
+  payload     Json
+  error       String?
+  createdAt   DateTime           @default(now())
+  processedAt DateTime?
+  profile     Profile            @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, dedupeKey])
+  @@index([profileId, createdAt])
+  @@map("webhook_events")
+}

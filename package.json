@@ -1,0 +1,42 @@
+{
+  "name": "cim-ai-saas",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.19.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prisma:generate": "sh -ac 'set -a; . ./.env.local; set +a; prisma generate'",
+    "prisma:migrate": "sh -ac 'set -a; . ./.env.local; set +a; prisma migrate dev'",
+    "prisma:push": "sh -ac 'set -a; . ./.env.local; set +a; prisma db push'"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "@supabase/ssr": "latest",
+    "@supabase/supabase-js": "latest",
+    "clsx": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "latest",
+    "postcss": "^8.5.6",
+    "prisma": "^6.19.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.9.3",
+    "vitest": "latest"
+  }
+}
