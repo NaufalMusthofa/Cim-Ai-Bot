@@ -18,22 +18,23 @@ export function StatCard(props: {
   const tone = props.tone || "blue";
 
   return (
-    <article className="metric-card p-6">
+    <article className="surface-card relative overflow-hidden p-5">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-r from-slate-100/80 via-white/10 to-transparent" />
       <div className="flex items-start justify-between gap-4">
-        <div>
+        <div className="relative">
           <p className="text-sm font-medium text-slate-500">{props.label}</p>
-          <p className="mt-4 font-display text-4xl text-slate-950">{props.value}</p>
+          <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">{props.value}</p>
         </div>
         <span
           className={clsx(
-            "inline-flex h-14 w-14 items-center justify-center rounded-2xl",
+            "relative inline-flex h-12 w-12 items-center justify-center rounded-2xl",
             TONE_CLASSES[tone]
           )}
         >
           {props.icon || <span className="h-2.5 w-2.5 rounded-full bg-current" />}
         </span>
       </div>
-      <p className="mt-5 text-sm leading-7 text-slate-600">{props.hint}</p>
+      <p className="relative mt-3 text-sm leading-6 text-slate-500">{props.hint}</p>
     </article>
   );
 }

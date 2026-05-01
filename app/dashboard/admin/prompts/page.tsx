@@ -30,7 +30,7 @@ export default async function AdminPromptsPage(props: {
   const activeCount = promptCards.filter((card: PromptCardRow) => card.isActive).length;
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell animate-fade-in">
       <PageHero
         eyebrow="Prompt Manager"
         title="Kelola prompt cards global untuk AI, fallback, dan follow-up."
@@ -47,9 +47,9 @@ export default async function AdminPromptsPage(props: {
       {error ? <p className="rounded-2xl bg-rose-100 px-4 py-3 text-sm text-rose-700">{error}</p> : null}
 
       <section className="grid gap-6 xl:grid-cols-[360px_1fr]">
-        <article className="panel h-fit p-6 xl:sticky xl:top-4">
+        <article className="surface-card h-fit p-6 xl:sticky xl:top-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Create Prompt Card</p>
-          <h3 className="mt-3 font-display text-3xl text-slate-950">Tambah versi prompt baru.</h3>
+          <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Tambah versi prompt baru.</h3>
 
           <form action={createPromptCardAction} className="mt-6 space-y-4">
             <div>
@@ -83,18 +83,18 @@ export default async function AdminPromptsPage(props: {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">{type}</p>
-                    <h3 className="mt-2 font-display text-3xl text-slate-950">{PROMPT_TYPE_LABELS[type]}</h3>
+                    <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{PROMPT_TYPE_LABELS[type]}</h3>
                   </div>
                   <PillBadge label={`${cards.length} card`} tone="slate" />
                 </div>
 
                 <div className="grid gap-4">
                   {cards.map((card: PromptCardRow) => (
-                    <article key={card.id} className="panel p-6">
+                    <article key={card.id} className="surface-card p-6">
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
                           <div className="flex flex-wrap items-center gap-3">
-                            <h4 className="font-display text-2xl text-slate-950">{card.name}</h4>
+                            <h4 className="text-xl font-semibold tracking-tight text-slate-950">{card.name}</h4>
                             <PillBadge label={card.isActive ? "ACTIVE" : "INACTIVE"} tone={card.isActive ? "green" : "slate"} />
                           </div>
                           <p className="mt-2 text-sm text-slate-500">Update prompt card aktif sesuai kebutuhan mode AI atau follow-up.</p>

@@ -16,7 +16,7 @@ export default async function WhatsAppPage(props: {
   const webhookUrl = `${getAppUrl()}/api/webhook/fonnte/${profile.id}/${profile.webhookKey}`;
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell animate-fade-in">
       <PageHero
         eyebrow="WhatsApp Onboarding"
         title="Hubungkan tenant ke Fonnte dengan setup yang lebih jelas."
@@ -28,11 +28,11 @@ export default async function WhatsAppPage(props: {
       {error ? <p className="rounded-2xl bg-rose-100 px-4 py-3 text-sm text-rose-700">{error}</p> : null}
 
       <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
-        <article className="panel p-6">
+        <article className="surface-card p-6">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Current Connection</p>
-              <h3 className="mt-3 font-display text-3xl text-slate-950">Status token dan webhook tenant.</h3>
+              <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Status token dan webhook tenant.</h3>
             </div>
             <PillBadge label="Ready for Fonnte" tone="blue" />
           </div>
@@ -57,9 +57,9 @@ export default async function WhatsAppPage(props: {
           </form>
         </article>
 
-        <article className="panel p-6">
+        <article className="surface-card p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Setup Device</p>
-          <h3 className="mt-3 font-display text-3xl text-slate-950">Simpan token dan ikuti alur pemasangan webhook.</h3>
+          <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Simpan token dan ikuti alur pemasangan webhook.</h3>
 
           <form action={saveWhatsAppConnectionAction} className="mt-6 space-y-4">
             <div>

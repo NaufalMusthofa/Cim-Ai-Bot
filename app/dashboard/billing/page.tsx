@@ -21,7 +21,7 @@ export default async function DashboardBillingPage(props: {
     : null;
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell animate-fade-in">
       <PageHero
         eyebrow="Billing & Subscription"
         title="Kelola tier tenant, quota aktif, dan upgrade payment manual."
@@ -38,11 +38,11 @@ export default async function DashboardBillingPage(props: {
       {error ? <p className="rounded-2xl bg-rose-100 px-4 py-3 text-sm text-rose-700">{error}</p> : null}
 
       <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <article className="panel p-6">
+        <article className="surface-card p-6">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Current Subscription</p>
-              <h3 className="mt-3 font-display text-3xl text-slate-950">Status plan dan penggunaan saat ini.</h3>
+              <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Status plan dan penggunaan saat ini.</h3>
             </div>
             <PillBadge label={subscription.plan} tone={subscription.plan === "PRO" ? "violet" : "blue"} />
           </div>
@@ -73,9 +73,9 @@ export default async function DashboardBillingPage(props: {
           </dl>
         </article>
 
-        <article className="panel p-6">
+        <article className="surface-card p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Upgrade to PRO</p>
-          <h3 className="mt-3 font-display text-3xl text-slate-950">Upgrade manual dengan bukti transfer yang masuk ke admin queue.</h3>
+          <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Upgrade manual dengan bukti transfer yang masuk ke admin queue.</h3>
           <p className="mt-4 text-sm leading-7 text-slate-600">
             Paket PRO seharga Rp{PRO_PLAN_AMOUNT.toLocaleString("id-ID")} per bulan dengan limit 300 chat. Upload bukti transfer di sini, lalu admin akan review dan mengaktifkan akun secara manual.
           </p>

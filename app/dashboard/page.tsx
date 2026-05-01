@@ -44,7 +44,7 @@ export default async function DashboardPage() {
   const summary = await getDashboardSummary(profile.id);
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell animate-fade-in">
       <PageHero
         eyebrow="Dashboard"
         title="Workspace operasional tenant yang simpel, rapi, dan enak dibaca."
@@ -99,11 +99,11 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <article className="panel p-6">
+        <article className="surface-card p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Tenant Status</p>
-              <h3 className="mt-3 font-display text-3xl text-slate-950">Snapshot akun dan koneksi tenant.</h3>
+              <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Snapshot akun dan koneksi tenant.</h3>
             </div>
             <PillBadge label={subscription.plan} tone={subscription.plan === "PRO" ? "violet" : "blue"} />
           </div>
@@ -130,9 +130,9 @@ export default async function DashboardPage() {
           </dl>
         </article>
 
-        <article className="panel p-6">
+        <article className="surface-card p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Quick Navigation</p>
-          <h3 className="mt-3 font-display text-3xl text-slate-950">Masuk ke area kerja yang paling sering dipakai.</h3>
+          <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Masuk ke area kerja yang paling sering dipakai.</h3>
 
           <div className="mt-6 grid gap-3">
             <Link href="/dashboard/chat" className="muted-card flex items-center justify-between p-4 transition hover:-translate-y-0.5 hover:bg-white">
@@ -160,11 +160,11 @@ export default async function DashboardPage() {
         </article>
       </section>
 
-      <section className="panel p-6">
+      <section className="surface-card p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Recent Messages</p>
-            <h3 className="mt-3 font-display text-3xl text-slate-950">Pesan terbaru yang masuk ke tenant ini.</h3>
+            <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Pesan terbaru yang masuk ke tenant ini.</h3>
           </div>
           <Link href="/dashboard/chat-history" className="button-secondary">
             Buka semua history

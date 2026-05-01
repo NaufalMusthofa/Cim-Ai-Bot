@@ -11,7 +11,7 @@ export default async function ContactsPage() {
   const contacts = await listContactsByProfile(profile.id);
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell animate-fade-in">
       <PageHero
         eyebrow="CRM Contacts"
         title="Kontak yang tersimpan dari seluruh chat masuk tenant."

@@ -23,7 +23,7 @@ export default async function AdminPage(props: {
   const activePromptCards = promptCards.filter((card: PromptCardRow) => card.isActive).length;
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell animate-fade-in">
       <PageHero
         eyebrow="Admin Control"
         title="Kelola payment tenant dan prompt global dari workspace admin yang lebih jelas."
@@ -41,7 +41,7 @@ export default async function AdminPage(props: {
       <section className="grid gap-6 xl:grid-cols-3">
         <article className="metric-card p-6">
           <p className="text-sm font-medium text-slate-500">Payment Pending</p>
-          <h3 className="mt-4 font-display text-4xl text-slate-950">{pendingPayments}</h3>
+          <h3 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">{pendingPayments}</h3>
           <p className="mt-3 text-sm leading-7 text-slate-600">
             Pengajuan pembayaran tenant yang masih menunggu verifikasi admin.
           </p>
@@ -52,7 +52,7 @@ export default async function AdminPage(props: {
 
         <article className="metric-card p-6">
           <p className="text-sm font-medium text-slate-500">Payment Approved</p>
-          <h3 className="mt-4 font-display text-4xl text-slate-950">{approvedPayments}</h3>
+          <h3 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">{approvedPayments}</h3>
           <p className="mt-3 text-sm leading-7 text-slate-600">
             Riwayat aktivasi plan PRO yang sudah disetujui admin lewat payment manual.
           </p>
@@ -63,7 +63,7 @@ export default async function AdminPage(props: {
 
         <article className="metric-card p-6">
           <p className="text-sm font-medium text-slate-500">Prompt Manager</p>
-          <h3 className="mt-4 font-display text-4xl text-slate-950">{activePromptCards}</h3>
+          <h3 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">{activePromptCards}</h3>
           <p className="mt-3 text-sm leading-7 text-slate-600">
             Jumlah prompt card aktif yang sedang dipakai runtime AI, fallback, dan follow-up.
           </p>

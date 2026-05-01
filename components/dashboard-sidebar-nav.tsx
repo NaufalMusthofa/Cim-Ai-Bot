@@ -188,15 +188,16 @@ function isItemActive(pathname: string, item: NavItem) {
   return item.matchPaths.includes(pathname);
 }
 
-export function DashboardSidebarNav(props: { isAdmin: boolean }) {
+export function DashboardSidebarNav(props: { isAdmin: boolean; collapsed?: boolean }) {
   const pathname = usePathname();
   const groups = props.isAdmin ? [...BASE_GROUPS, ADMIN_GROUP] : BASE_GROUPS;
+  const collapsed = props.collapsed || false;
 
   return (
     <nav className="mt-8 space-y-8">
       {groups.map((group) => (
         <div key={group.label}>
-          <p className="sidebar-group-title">{group.label}</p>
+          {!collapsed ? <p className="sidebar-group-title">{group.label}</p> : null}
           <div className="mt-3 space-y-2">
             {group.items.map((item) => {
               const isActive = isItemActive(pathname, item);
@@ -206,20 +207,25 @@ export function DashboardSidebarNav(props: { isAdmin: boolean }) {
                   key={item.href}
                   href={item.href}
                   className={clsx("sidebar-link", isActive && "sidebar-link-active")}
+                  title={collapsed ? item.label : undefined}
                 >
                   <span className="sidebar-link-icon">
                     <SidebarIcon name={item.icon} />
                   </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold">{item.label}</span>
-                    <span className="mt-1 block truncate text-xs text-slate-300/70">{item.hint}</span>
-                  </span>
-                  <span
-                    className={clsx(
-                      "h-2.5 w-2.5 rounded-full transition",
-                      isActive ? "bg-cyan-300 shadow-[0_0_16px_rgba(103,232,249,0.95)]" : "bg-white/12"
-                    )}
-                  />
+                  {!collapsed ? (
+                    <>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold">{item.label}</span>
+                        <span className="mt-1 block truncate text-xs text-slate-300/70">{item.hint}</span>
+                      </span>
+                      <span
+                        className={clsx(
+                          "h-2.5 w-2.5 rounded-full transition",
+                          isActive ? "bg-cyan-300 shadow-[0_0_16px_rgba(103,232,249,0.95)]" : "bg-white/12"
+                        )}
+                      />
+                    </>
+                  ) : null}
                 </Link>
               );
             })}

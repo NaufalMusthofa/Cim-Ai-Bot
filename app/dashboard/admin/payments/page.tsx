@@ -29,7 +29,7 @@ export default async function AdminPaymentsPage(props: {
   const rejectedCount = payments.filter((payment: PaymentRequestRow) => payment.status === "REJECTED").length;
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell animate-fade-in">
       <PageHero
         eyebrow="Admin Payments"
         title="Review bukti transfer dan aktifkan tenant PRO dengan lebih rapi."
@@ -48,26 +48,26 @@ export default async function AdminPaymentsPage(props: {
       <section className="grid gap-4 xl:grid-cols-3">
         <article className="metric-card p-5">
           <p className="text-sm font-medium text-slate-500">Pending</p>
-          <p className="mt-3 font-display text-4xl text-slate-950">{pendingCount}</p>
+          <p className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">{pendingCount}</p>
         </article>
         <article className="metric-card p-5">
           <p className="text-sm font-medium text-slate-500">Approved</p>
-          <p className="mt-3 font-display text-4xl text-slate-950">{approvedCount}</p>
+          <p className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">{approvedCount}</p>
         </article>
         <article className="metric-card p-5">
           <p className="text-sm font-medium text-slate-500">Rejected</p>
-          <p className="mt-3 font-display text-4xl text-slate-950">{rejectedCount}</p>
+          <p className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">{rejectedCount}</p>
         </article>
       </section>
 
       <div className="space-y-4">
         {payments.length ? (
           payments.map((payment: PaymentRequestRow) => (
-            <article key={payment.id} className="panel p-6">
+            <article key={payment.id} className="surface-card p-6">
               <div className="flex flex-col gap-4 border-b border-slate-200/75 pb-5 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <h3 className="font-display text-3xl text-slate-950">
+                    <h3 className="text-3xl font-semibold tracking-tight text-slate-950">
                       {payment.profile.businessName || payment.profile.email}
                     </h3>
                     <PillBadge
@@ -124,7 +124,7 @@ export default async function AdminPaymentsPage(props: {
             </article>
           ))
         ) : (
-          <section className="panel p-6 text-sm text-slate-500">Belum ada payment request yang masuk.</section>
+          <section className="surface-card p-6 text-sm text-slate-500">Belum ada payment request yang masuk.</section>
         )}
       </div>
     </div>
