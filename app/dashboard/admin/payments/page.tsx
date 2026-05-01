@@ -1,9 +1,11 @@
+import { PageHero } from "@/components/page-hero";
+import { PillBadge } from "@/components/pill-badge";
+import { SubmitButton } from "@/components/submit-button";
 import { assertAdmin } from "@/lib/auth";
 import { formatDateTime } from "@/lib/utils";
+import { approvePaymentRequestAction, rejectPaymentRequestAction } from "@/app/dashboard/admin/actions";
 import { listPaymentRequests } from "@/repositories/payment.repository";
 import { getPaymentProofSignedUrl } from "@/services/payment/payment.service";
-import { SubmitButton } from "@/components/submit-button";
-import { approvePaymentRequestAction, rejectPaymentRequestAction } from "@/app/dashboard/admin/actions";
 
 type PaymentRequestRow = Awaited<ReturnType<typeof listPaymentRequests>>[number];
 
@@ -22,32 +24,73 @@ export default async function AdminPaymentsPage(props: {
   );
   const proofUrlMap = new Map<string, string | null>(proofUrls.map((item: { id: string; url: string | null }) => [item.id, item.url]));
 
+  const pendingCount = payments.filter((payment: PaymentRequestRow) => payment.status === "PENDING").length;
+  const approvedCount = payments.filter((payment: PaymentRequestRow) => payment.status === "APPROVED").length;
+  const rejectedCount = payments.filter((payment: PaymentRequestRow) => payment.status === "REJECTED").length;
+
   return (
     <div className="space-y-6">
-      <section className="panel p-8">
-        <p className="text-sm uppercase tracking-[0.2em] text-ember/80">Admin Payments</p>
-        <h2 className="mt-3 font-display text-5xl text-ink">Review bukti transfer dan aktifkan tenant PRO.</h2>
-        {message ? <p className="mt-6 rounded-2xl bg-pine/10 px-4 py-3 text-sm text-pine">{message}</p> : null}
+      <PageHero
+        eyebrow="Admin Payments"
+        title="Review bukti transfer dan aktifkan tenant PRO dengan lebih rapi."
+        description="Queue ini tetap memakai alur approve/reject yang sama. Perubahan di sini hanya merapikan summary, kartu review, dan akses bukti transfer."
+        meta={
+          <>
+            <PillBadge label={`${pendingCount} pending`} tone="amber" />
+            <PillBadge label={`${approvedCount} approved`} tone="green" />
+            <PillBadge label={`${rejectedCount} rejected`} tone="rose" />
+          </>
+        }
+      />
+
+      {message ? <p className="rounded-2xl bg-emerald-100 px-4 py-3 text-sm text-emerald-700">{message}</p> : null}
+
+      <section className="grid gap-4 xl:grid-cols-3">
+        <article className="metric-card p-5">
+          <p className="text-sm font-medium text-slate-500">Pending</p>
+          <p className="mt-3 font-display text-4xl text-slate-950">{pendingCount}</p>
+        </article>
+        <article className="metric-card p-5">
+          <p className="text-sm font-medium text-slate-500">Approved</p>
+          <p className="mt-3 font-display text-4xl text-slate-950">{approvedCount}</p>
+        </article>
+        <article className="metric-card p-5">
+          <p className="text-sm font-medium text-slate-500">Rejected</p>
+          <p className="mt-3 font-display text-4xl text-slate-950">{rejectedCount}</p>
+        </article>
       </section>
 
       <div className="space-y-4">
         {payments.length ? (
           payments.map((payment: PaymentRequestRow) => (
             <article key={payment.id} className="panel p-6">
-              <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-col gap-4 border-b border-slate-200/75 pb-5 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <h3 className="font-display text-3xl text-ink">{payment.profile.businessName || payment.profile.email}</h3>
-                  <p className="mt-1 text-sm text-ink/60">{payment.profile.email}</p>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h3 className="font-display text-3xl text-slate-950">
+                      {payment.profile.businessName || payment.profile.email}
+                    </h3>
+                    <PillBadge
+                      label={payment.status}
+                      tone={
+                        payment.status === "APPROVED"
+                          ? "green"
+                          : payment.status === "REJECTED"
+                            ? "rose"
+                            : "amber"
+                      }
+                    />
+                  </div>
+                  <p className="mt-2 text-sm text-slate-500">{payment.profile.email}</p>
                 </div>
-                <div className="text-sm text-ink/60">
-                  <p>Status: {payment.status}</p>
+                <div className="text-sm text-slate-500">
                   <p>Submit: {formatDateTime(payment.requestedAt)}</p>
+                  <p>Plan: {payment.plan}</p>
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-4 lg:grid-cols-2">
-                <div className="rounded-[22px] border border-ink/8 bg-white/75 p-4 text-sm leading-7 text-ink/75">
-                  <p>Plan: {payment.plan}</p>
+              <div className="mt-5 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+                <div className="surface-note p-4 text-sm leading-7 text-slate-700">
                   <p>Nominal: Rp{payment.amount.toLocaleString("id-ID")}</p>
                   <p>Catatan user: {payment.senderNote || "-"}</p>
                   <p>Review note: {payment.reviewNote || "-"}</p>
@@ -57,7 +100,7 @@ export default async function AdminPaymentsPage(props: {
                         href={proofUrlMap.get(payment.id) || undefined}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-ember underline"
+                        className="font-medium text-blue-700"
                       >
                         Lihat bukti transfer
                       </a>
@@ -66,12 +109,12 @@ export default async function AdminPaymentsPage(props: {
                 </div>
 
                 <div className="space-y-4">
-                  <form action={approvePaymentRequestAction} className="rounded-[22px] border border-pine/15 bg-pine/5 p-4">
+                  <form action={approvePaymentRequestAction} className="rounded-[24px] border border-emerald-200 bg-emerald-50 p-4">
                     <input type="hidden" name="paymentRequestId" value={payment.id} />
                     <SubmitButton idleLabel="Approve & Aktifkan PRO" className="button-primary" />
                   </form>
 
-                  <form action={rejectPaymentRequestAction} className="rounded-[22px] border border-ember/15 bg-ember/5 p-4 space-y-3">
+                  <form action={rejectPaymentRequestAction} className="rounded-[24px] border border-rose-200 bg-rose-50 p-4 space-y-3">
                     <input type="hidden" name="paymentRequestId" value={payment.id} />
                     <textarea name="reviewNote" rows={3} placeholder="Alasan reject / catatan admin" />
                     <SubmitButton idleLabel="Reject Payment" className="button-secondary" />
@@ -81,7 +124,7 @@ export default async function AdminPaymentsPage(props: {
             </article>
           ))
         ) : (
-          <section className="panel p-6 text-sm text-ink/60">Belum ada payment request yang masuk.</section>
+          <section className="panel p-6 text-sm text-slate-500">Belum ada payment request yang masuk.</section>
         )}
       </div>
     </div>

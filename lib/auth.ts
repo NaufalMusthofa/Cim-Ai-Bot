@@ -16,22 +16,41 @@ export async function requireAppSession() {
   return user;
 }
 
-export async function requireAppWorkspace() {
+export function isAdminEmail(email?: string | null) {
+  const adminEmails = getAdminEmails();
+
+  return adminEmails.length === 0 && process.env.NODE_ENV !== "production"
+    ? true
+    : adminEmails.includes(email?.toLowerCase() || "");
+}
+
+export async function getAppWorkspaceContext() {
   const user = await requireAppSession();
-  return ensureWorkspaceForUser({
+  const workspace = await ensureWorkspaceForUser({
     id: user.id,
     email: user.email || "",
     businessName: user.user_metadata?.business_name as string | undefined
   });
+
+  return {
+    user,
+    isAdmin: isAdminEmail(user.email),
+    ...workspace
+  };
+}
+
+export async function requireAppWorkspace() {
+  const { profile, subscription } = await getAppWorkspaceContext();
+
+  return {
+    profile,
+    subscription
+  };
 }
 
 export async function assertAdmin() {
   const user = await requireAppSession();
-  const adminEmails = getAdminEmails();
-  const isAdmin =
-    adminEmails.length === 0 && process.env.NODE_ENV !== "production"
-      ? true
-      : adminEmails.includes(user.email?.toLowerCase() || "");
+  const isAdmin = isAdminEmail(user.email);
 
   if (!isAdmin) {
     redirect("/dashboard");

@@ -1,11 +1,10 @@
+import { PageHero } from "@/components/page-hero";
+import { PillBadge } from "@/components/pill-badge";
+import { SubmitButton } from "@/components/submit-button";
 import { requireAppWorkspace } from "@/lib/auth";
 import { getAppUrl } from "@/lib/env";
 import { redactToken } from "@/lib/utils";
-import { SubmitButton } from "@/components/submit-button";
-import {
-  regenerateWebhookKeyAction,
-  saveWhatsAppConnectionAction
-} from "@/app/dashboard/actions";
+import { regenerateWebhookKeyAction, saveWhatsAppConnectionAction } from "@/app/dashboard/actions";
 
 export default async function WhatsAppPage(props: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -18,53 +17,70 @@ export default async function WhatsAppPage(props: {
 
   return (
     <div className="space-y-6">
-      <section className="panel p-8">
-        <p className="text-sm uppercase tracking-[0.2em] text-ember/80">WhatsApp Onboarding</p>
-        <h2 className="mt-3 font-display text-5xl text-ink">Hubungkan tenant ke Fonnte.</h2>
-        <p className="mt-4 max-w-3xl text-lg leading-8 text-ink/70">
-          Simpan token Fonnte milik tenant ini, lalu copy webhook URL unik di bawah ke dashboard device Fonnte.
-        </p>
-        {message ? <p className="mt-6 rounded-2xl bg-pine/10 px-4 py-3 text-sm text-pine">{message}</p> : null}
-        {error ? <p className="mt-4 rounded-2xl bg-ember/10 px-4 py-3 text-sm text-ember">{error}</p> : null}
-      </section>
+      <PageHero
+        eyebrow="WhatsApp Onboarding"
+        title="Hubungkan tenant ke Fonnte dengan setup yang lebih jelas."
+        description="Halaman ini dipakai untuk menyimpan token, mengambil webhook URL unik, dan memastikan tenant siap menerima serta membalas chat WhatsApp."
+        meta={<PillBadge label="Auto Route: Personal + Sales" tone="green" />}
+      />
 
-      <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+      {message ? <p className="rounded-2xl bg-emerald-100 px-4 py-3 text-sm text-emerald-700">{message}</p> : null}
+      {error ? <p className="rounded-2xl bg-rose-100 px-4 py-3 text-sm text-rose-700">{error}</p> : null}
+
+      <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
         <article className="panel p-6">
-          <h3 className="font-display text-3xl text-ink">Koneksi Saat Ini</h3>
-          <dl className="mt-6 space-y-4 text-sm text-ink/75">
-            <div className="rounded-[20px] bg-white/65 p-4">
-              <dt className="text-xs uppercase tracking-[0.18em] text-ember/80">Token Fonnte</dt>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Current Connection</p>
+              <h3 className="mt-3 font-display text-3xl text-slate-950">Status token dan webhook tenant.</h3>
+            </div>
+            <PillBadge label="Ready for Fonnte" tone="blue" />
+          </div>
+
+          <dl className="mt-6 space-y-4 text-sm text-slate-700">
+            <div className="muted-card p-4">
+              <dt className="text-xs uppercase tracking-[0.18em] text-slate-500">Token Fonnte</dt>
               <dd className="mt-2">{redactToken(profile.fonnteToken)}</dd>
             </div>
-            <div className="rounded-[20px] bg-white/65 p-4">
-              <dt className="text-xs uppercase tracking-[0.18em] text-ember/80">Webhook URL unik</dt>
+            <div className="muted-card p-4">
+              <dt className="text-xs uppercase tracking-[0.18em] text-slate-500">Webhook URL unik</dt>
               <dd className="mt-2 break-all">{webhookUrl}</dd>
             </div>
-            <div className="rounded-[20px] bg-white/65 p-4">
-              <dt className="text-xs uppercase tracking-[0.18em] text-ember/80">Mode AI</dt>
+            <div className="muted-card p-4">
+              <dt className="text-xs uppercase tracking-[0.18em] text-slate-500">Mode AI aktif</dt>
               <dd className="mt-2">Auto Route: Personal + Sales</dd>
             </div>
           </dl>
+
           <form action={regenerateWebhookKeyAction} className="mt-6">
             <SubmitButton idleLabel="Regenerate Webhook Key" className="button-secondary" />
           </form>
         </article>
 
         <article className="panel p-6">
-          <h3 className="font-display text-3xl text-ink">Simpan Token</h3>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Setup Device</p>
+          <h3 className="mt-3 font-display text-3xl text-slate-950">Simpan token dan ikuti alur pemasangan webhook.</h3>
+
           <form action={saveWhatsAppConnectionAction} className="mt-6 space-y-4">
             <div>
-              <label className="mb-2 block text-sm text-ink/70">Token Fonnte</label>
-              <input name="fonnteToken" required defaultValue={profile.fonnteToken || ""} placeholder="Masukkan token Fonnte milik tenant" />
+              <label className="mb-2 block text-sm text-slate-600">Token Fonnte</label>
+              <input
+                name="fonnteToken"
+                required
+                defaultValue={profile.fonnteToken || ""}
+                placeholder="Masukkan token Fonnte milik tenant"
+              />
             </div>
             <SubmitButton idleLabel="Simpan Token" className="button-primary" />
           </form>
-          <div className="mt-6 rounded-[20px] border border-ink/8 bg-white/65 p-4 text-sm leading-7 text-ink/70">
-            <p>Langkah setup:</p>
+
+          <div className="surface-note mt-6 p-5 text-sm leading-7 text-slate-600">
+            <p className="font-semibold text-slate-900">Langkah setup</p>
             <ol className="mt-3 list-decimal space-y-2 pl-5">
               <li>Scan device tenant di Fonnte.</li>
-              <li>Paste webhook URL dari halaman ini di dashboard/device Fonnte.</li>
-              <li>Simpan token agar aplikasi bisa membalas chat keluar.</li>
+              <li>Paste webhook URL dari halaman ini ke dashboard device Fonnte.</li>
+              <li>Pastikan `autoread` aktif agar chatbot bisa memproses pesan masuk.</li>
+              <li>Simpan token supaya aplikasi bisa membalas chat keluar dengan benar.</li>
             </ol>
           </div>
         </article>

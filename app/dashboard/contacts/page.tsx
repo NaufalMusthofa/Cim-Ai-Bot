@@ -1,3 +1,5 @@
+import { PageHero } from "@/components/page-hero";
+import { PillBadge } from "@/components/pill-badge";
 import { requireAppWorkspace } from "@/lib/auth";
 import { formatDateTime } from "@/lib/utils";
 import { listContactsByProfile } from "@/repositories/contact.repository";
@@ -10,10 +12,12 @@ export default async function ContactsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="panel p-8">
-        <p className="text-sm uppercase tracking-[0.2em] text-ember/80">CRM Contacts</p>
-        <h2 className="mt-3 font-display text-5xl text-ink">Kontak tersimpan dari seluruh chat masuk.</h2>
-      </section>
+      <PageHero
+        eyebrow="CRM Contacts"
+        title="Kontak yang tersimpan dari seluruh chat masuk tenant."
+        description="Daftar ini membantu Anda melihat siapa yang aktif, mode balas yang dipakai, dan seberapa jauh follow-up atau memory sudah terbentuk."
+        meta={<PillBadge label={`${contacts.length} kontak`} tone="blue" />}
+      />
 
       <section className="table-shell">
         <table>
@@ -24,6 +28,7 @@ export default async function ContactsPage() {
               <th>Interaksi terakhir</th>
               <th>Follow-up</th>
               <th>Memory</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -31,20 +36,27 @@ export default async function ContactsPage() {
               contacts.map((contact: ContactRow) => (
                 <tr key={contact.id}>
                   <td>
-                    <p className="font-medium text-ink">{contact.displayName || "Tanpa nama"}</p>
-                    <p className="mt-1 text-sm text-ink/60">{contact.phone}</p>
+                    <p className="font-semibold text-slate-900">{contact.displayName || "Tanpa nama"}</p>
+                    <p className="mt-1 text-sm text-slate-500">{contact.phone}</p>
                   </td>
-                  <td className="text-sm text-ink/70">{contact.mode}</td>
-                  <td className="text-sm text-ink/70">
+                  <td>
+                    <PillBadge label={contact.mode} tone={contact.mode === "AI" ? "blue" : "green"} />
+                  </td>
+                  <td className="text-sm text-slate-600">
                     {contact.lastInteraction ? formatDateTime(contact.lastInteraction) : "Belum ada balasan AI"}
                   </td>
-                  <td className="text-sm text-ink/70">{contact.followupCount}x terkirim</td>
-                  <td className="text-sm text-ink/70">{contact.memories.length} memory item</td>
+                  <td className="text-sm text-slate-600">{contact.followupCount}x terkirim</td>
+                  <td className="text-sm text-slate-600">{contact.memories.length} memory item</td>
+                  <td>
+                    <a href={`/dashboard/chat?contact=${contact.id}`} className="button-secondary">
+                      Buka Chat
+                    </a>
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="text-sm text-ink/60">
+                <td colSpan={6} className="text-sm text-slate-500">
                   Belum ada kontak. Data akan muncul setelah webhook Fonnte menerima chat personal 1:1.
                 </td>
               </tr>
