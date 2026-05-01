@@ -15,6 +15,7 @@ export default async function DashboardBillingPage(props: {
   const searchParams = props.searchParams ? await props.searchParams : {};
   const message = Array.isArray(searchParams.message) ? searchParams.message[0] : searchParams.message;
   const error = Array.isArray(searchParams.error) ? searchParams.error[0] : searchParams.error;
+  const notice = Array.isArray(searchParams.notice) ? searchParams.notice[0] : searchParams.notice;
   const paymentState = await getBillingPaymentState(profile.id);
   const latestProofUrl = paymentState.latestPayment?.proofPath
     ? await getPaymentProofSignedUrl(paymentState.latestPayment.proofPath)
@@ -36,6 +37,7 @@ export default async function DashboardBillingPage(props: {
 
       {message ? <p className="rounded-2xl bg-emerald-100 px-4 py-3 text-sm text-emerald-700">{message}</p> : null}
       {error ? <p className="rounded-2xl bg-rose-100 px-4 py-3 text-sm text-rose-700">{error}</p> : null}
+      {notice ? <p className="rounded-2xl bg-amber-100 px-4 py-3 text-sm text-amber-800">{notice}</p> : null}
 
       <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <article className="surface-card p-6">

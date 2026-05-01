@@ -1,11 +1,21 @@
+function normalizeTargetPhone(value: string) {
+  return value.replace(/[^\d]/g, "");
+}
+
 export async function sendWhatsAppMessage(input: {
   token: string;
   target: string;
   message: string;
   inboxId?: string;
 }) {
+  const normalizedTarget = normalizeTargetPhone(input.target);
+
+  if (!normalizedTarget) {
+    throw new Error("Fonnte target phone tidak valid.");
+  }
+
   const payload = new URLSearchParams({
-    target: input.target,
+    target: normalizedTarget,
     message: input.message
   });
 
@@ -22,10 +32,43 @@ export async function sendWhatsAppMessage(input: {
     body: payload.toString()
   });
 
+  const rawBody = await response.text();
+
   if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Fonnte send failed: ${body}`);
+    throw new Error(`Fonnte send failed: ${rawBody}`);
   }
 
-  return response.json().catch(() => ({ ok: true }));
+  let responseBody: unknown = { ok: true };
+
+  if (rawBody) {
+    try {
+      responseBody = JSON.parse(rawBody);
+    } catch {
+      responseBody = {
+        ok: true,
+        raw: rawBody
+      };
+    }
+  }
+
+  if (responseBody && typeof responseBody === "object") {
+    const statusValue =
+      "status" in responseBody
+        ? (responseBody as { status?: unknown }).status
+        : "ok" in responseBody
+          ? (responseBody as { ok?: unknown }).ok
+          : undefined;
+
+    if (statusValue === false || statusValue === 0 || statusValue === "false") {
+      const reason =
+        "reason" in responseBody
+          ? String((responseBody as { reason?: unknown }).reason || "")
+          : "detail" in responseBody
+            ? String((responseBody as { detail?: unknown }).detail || "")
+            : "unknown_fonnte_error";
+      throw new Error(`Fonnte send failed: ${reason}`);
+    }
+  }
+
+  return responseBody;
 }

@@ -66,6 +66,7 @@ model Profile {
   id                 String          @id @db.Uuid
   email              String          @unique
   businessName       String?
+  whatsappNumber     String?
   plan               Plan            @default(FREE)
   fonnteToken        String?
   webhookKey         String          @unique

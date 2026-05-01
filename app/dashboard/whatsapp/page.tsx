@@ -39,6 +39,10 @@ export default async function WhatsAppPage(props: {
 
           <dl className="mt-6 space-y-4 text-sm text-slate-700">
             <div className="muted-card p-4">
+              <dt className="text-xs uppercase tracking-[0.18em] text-slate-500">Nomor WhatsApp tenant</dt>
+              <dd className="mt-2">{profile.whatsappNumber || "-"}</dd>
+            </div>
+            <div className="muted-card p-4">
               <dt className="text-xs uppercase tracking-[0.18em] text-slate-500">Token Fonnte</dt>
               <dd className="mt-2">{redactToken(profile.fonnteToken)}</dd>
             </div>
@@ -63,6 +67,14 @@ export default async function WhatsAppPage(props: {
 
           <form action={saveWhatsAppConnectionAction} className="mt-6 space-y-4">
             <div>
+              <label className="mb-2 block text-sm text-slate-600">Nomor WhatsApp tenant</label>
+              <input
+                name="whatsappNumber"
+                defaultValue={profile.whatsappNumber || ""}
+                placeholder="Contoh: 6281234567890"
+              />
+            </div>
+            <div>
               <label className="mb-2 block text-sm text-slate-600">Token Fonnte</label>
               <input
                 name="fonnteToken"
@@ -71,7 +83,7 @@ export default async function WhatsAppPage(props: {
                 placeholder="Masukkan token Fonnte milik tenant"
               />
             </div>
-            <SubmitButton idleLabel="Simpan Token" className="button-primary" />
+            <SubmitButton idleLabel="Simpan Koneksi WhatsApp" className="button-primary" />
           </form>
 
           <div className="surface-note mt-6 p-5 text-sm leading-7 text-slate-600">

@@ -83,6 +83,7 @@ export async function submitPaymentRequest(input: {
   profileId: string;
   tenantEmail: string;
   businessName?: string | null;
+  tenantPhone?: string | null;
   file: File;
   senderNote?: string;
   plan?: PlanType;
@@ -104,20 +105,41 @@ export async function submitPaymentRequest(input: {
     senderNote: input.senderNote
   });
 
+  let adminNotification: {
+    ok: boolean;
+    reason: string | null;
+  } = {
+    ok: true,
+    reason: null
+  };
+
   try {
-    await sendAdminPaymentNotification({
+    const result = await sendAdminPaymentNotification({
       tenantEmail: input.tenantEmail,
       businessName: input.businessName,
+      tenantPhone: input.tenantPhone,
       plan,
       amount: paymentRequest.amount,
       requestedAt: paymentRequest.requestedAt,
       senderNote: paymentRequest.senderNote
     });
+
+    adminNotification = {
+      ok: result.ok,
+      reason: result.ok ? null : result.reason
+    };
   } catch (error) {
+    adminNotification = {
+      ok: false,
+      reason: error instanceof Error ? error.message : "unknown_admin_notification_error"
+    };
     console.error("[payment] admin notification failed", error);
   }
 
-  return paymentRequest;
+  return {
+    paymentRequest,
+    adminNotification
+  };
 }
 
 export async function approvePaymentRequest(input: {

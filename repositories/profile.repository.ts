@@ -20,6 +20,7 @@ export async function ensureProfile(input: {
   id: string;
   email: string;
   businessName?: string | null;
+  whatsappNumber?: string | null;
   webhookKey: string;
   fonnteToken?: string;
 }) {
@@ -27,12 +28,14 @@ export async function ensureProfile(input: {
     where: { id: input.id },
     update: {
       email: input.email,
-      businessName: input.businessName ?? undefined
+      businessName: input.businessName ?? undefined,
+      ...(input.whatsappNumber !== undefined ? { whatsappNumber: input.whatsappNumber || null } : {})
     },
     create: {
       id: input.id,
       email: input.email,
       businessName: input.businessName ?? undefined,
+      whatsappNumber: input.whatsappNumber ?? undefined,
       webhookKey: input.webhookKey,
       fonnteToken: input.fonnteToken
     }
@@ -43,6 +46,7 @@ export async function updateWhatsAppConnection(
   profileId: string,
   input: {
     fonnteToken?: string;
+    whatsappNumber?: string | null;
     webhookKey?: string;
   }
 ) {
@@ -50,6 +54,7 @@ export async function updateWhatsAppConnection(
     where: { id: profileId },
     data: {
       ...(input.fonnteToken !== undefined ? { fonnteToken: input.fonnteToken } : {}),
+      ...(input.whatsappNumber !== undefined ? { whatsappNumber: input.whatsappNumber || null } : {}),
       ...(input.webhookKey !== undefined ? { webhookKey: input.webhookKey } : {})
     }
   });

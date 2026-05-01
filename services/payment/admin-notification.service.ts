@@ -4,6 +4,7 @@ import { sendWhatsAppMessage } from "@/services/whatsapp/fonnte.service";
 export async function sendAdminPaymentNotification(input: {
   tenantEmail: string;
   businessName?: string | null;
+  tenantPhone?: string | null;
   plan: "FREE" | "PRO";
   amount: number;
   requestedAt: Date;
@@ -24,6 +25,7 @@ export async function sendAdminPaymentNotification(input: {
     "",
     `Tenant: ${input.businessName || "-"}`,
     `Email: ${input.tenantEmail}`,
+    `No. WhatsApp Tenant: ${input.tenantPhone || "-"}`,
     `Plan: ${input.plan}`,
     `Nominal: Rp${input.amount.toLocaleString("id-ID")}`,
     `Waktu submit: ${input.requestedAt.toLocaleString("id-ID")}`,

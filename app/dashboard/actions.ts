@@ -18,17 +18,19 @@ function getValue(formData: FormData, key: string) {
 export async function saveWhatsAppConnectionAction(formData: FormData) {
   const { profile } = await requireAppWorkspace();
   const fonnteToken = getValue(formData, "fonnteToken");
+  const whatsappNumber = getValue(formData, "whatsappNumber");
 
   if (!fonnteToken) {
     redirect("/dashboard/whatsapp?error=Token Fonnte wajib diisi.");
   }
 
   await updateWhatsAppConnection(profile.id, {
-    fonnteToken
+    fonnteToken,
+    whatsappNumber: whatsappNumber || null
   });
 
   revalidatePath("/dashboard/whatsapp");
-  redirect("/dashboard/whatsapp?message=Token Fonnte berhasil disimpan.");
+  redirect("/dashboard/whatsapp?message=Token%20dan%20nomor%20WhatsApp%20berhasil%20disimpan.");
 }
 
 export async function regenerateWebhookKeyAction() {

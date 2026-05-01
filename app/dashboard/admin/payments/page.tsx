@@ -82,6 +82,7 @@ export default async function AdminPaymentsPage(props: {
                     />
                   </div>
                   <p className="mt-2 text-sm text-slate-500">{payment.profile.email}</p>
+                  <p className="mt-1 text-sm text-slate-500">WA tenant: {payment.profile.whatsappNumber || "-"}</p>
                 </div>
                 <div className="text-sm text-slate-500">
                   <p>Submit: {formatDateTime(payment.requestedAt)}</p>

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { getDefaultFonnteToken } from "@/lib/env";
+import { getDefaultFonnteNumber, getDefaultFonnteToken } from "@/lib/env";
 import { ensureProfile, findProfileById } from "@/repositories/profile.repository";
 import { updateWhatsAppConnection } from "@/repositories/profile.repository";
 import { ensureSubscriptionForPlan } from "@/services/subscription/subscription.service";
@@ -12,18 +12,21 @@ export async function ensureWorkspaceForUser(input: {
   const existing = await findProfileById(input.id);
   const webhookKey = existing?.webhookKey ?? randomUUID().replace(/-/g, "");
   const defaultFonnteToken = getDefaultFonnteToken() || undefined;
+  const defaultFonnteNumber = getDefaultFonnteNumber() || undefined;
 
   const profile = await ensureProfile({
     id: input.id,
     email: input.email,
     businessName: input.businessName,
+    whatsappNumber: existing?.whatsappNumber ?? defaultFonnteNumber,
     webhookKey,
     fonnteToken: existing?.fonnteToken ?? defaultFonnteToken
   });
 
-  if (!profile.fonnteToken && defaultFonnteToken) {
+  if ((!profile.fonnteToken && defaultFonnteToken) || (!profile.whatsappNumber && defaultFonnteNumber)) {
     await updateWhatsAppConnection(profile.id, {
-      fonnteToken: defaultFonnteToken
+      ...(profile.fonnteToken ? {} : { fonnteToken: defaultFonnteToken }),
+      ...(profile.whatsappNumber ? {} : { whatsappNumber: defaultFonnteNumber })
     });
   }
 
