@@ -15,6 +15,7 @@ export async function submitPaymentRequestAction(formData: FormData) {
   const senderNote = getValue(formData, "senderNote");
   const proofFile = formData.get("proofFile");
   let adminNotificationOk = true;
+  let deliveredVia: "whatsapp" | "email" | null = null;
 
   if (!(proofFile instanceof File) || proofFile.size <= 0) {
     redirect("/dashboard/billing?error=Bukti%20transfer%20wajib%20diunggah." as Route);
@@ -31,6 +32,7 @@ export async function submitPaymentRequestAction(formData: FormData) {
     });
 
     adminNotificationOk = result.adminNotification.ok;
+    deliveredVia = result.adminNotification.deliveredVia || null;
   } catch (error) {
     const message = error instanceof Error ? error.message : "Gagal mengirim pengajuan pembayaran.";
     redirect(`/dashboard/billing?error=${encodeURIComponent(message)}` as Route);
@@ -39,10 +41,18 @@ export async function submitPaymentRequestAction(formData: FormData) {
   revalidatePath("/dashboard/billing");
   revalidatePath("/dashboard/admin/payments");
 
+  if (deliveredVia === "email") {
+    redirect(
+      `/dashboard/billing?message=${encodeURIComponent("Pengajuan pembayaran berhasil disimpan.")}&notice=${encodeURIComponent(
+        "Notifikasi admin berhasil dikirim lewat email fallback karena WhatsApp gagal."
+      )}` as Route
+    );
+  }
+
   if (!adminNotificationOk) {
     redirect(
       `/dashboard/billing?message=${encodeURIComponent("Pengajuan pembayaran berhasil disimpan.")}&notice=${encodeURIComponent(
-        "Notifikasi WhatsApp ke admin belum berhasil terkirim. Cek token notifier, nomor admin, atau status device Fonnte."
+        "Notifikasi admin belum berhasil terkirim lewat WhatsApp maupun email. Cek token Fonnte, status device, dan konfigurasi SMTP email admin."
       )}` as Route
     );
   }

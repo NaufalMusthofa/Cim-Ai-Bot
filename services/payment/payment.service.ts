@@ -108,9 +108,13 @@ export async function submitPaymentRequest(input: {
   let adminNotification: {
     ok: boolean;
     reason: string | null;
+    deliveredVia?: "whatsapp" | "email" | null;
+    whatsapp?: { ok: boolean; reason: string };
+    email?: { ok: boolean; reason: string };
   } = {
     ok: true,
-    reason: null
+    reason: null,
+    deliveredVia: null
   };
 
   try {
@@ -126,12 +130,16 @@ export async function submitPaymentRequest(input: {
 
     adminNotification = {
       ok: result.ok,
-      reason: result.ok ? null : result.reason
+      reason: result.ok ? null : [result.whatsapp.reason, result.email.reason].filter(Boolean).join(" | "),
+      deliveredVia: result.deliveredVia,
+      whatsapp: result.whatsapp,
+      email: result.email
     };
   } catch (error) {
     adminNotification = {
       ok: false,
-      reason: error instanceof Error ? error.message : "unknown_admin_notification_error"
+      reason: error instanceof Error ? error.message : "unknown_admin_notification_error",
+      deliveredVia: null
     };
     console.error("[payment] admin notification failed", error);
   }
